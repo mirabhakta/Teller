@@ -1,79 +1,87 @@
-# LedgerGuard
+# Teller
 
-**A financial safety layer for AI agents.**
+**A second check before AI agents move money.**
 
-LedgerGuard evaluates financial actions before they're executed, combining AI-based risk detection, deterministic rules, and human review to catch potential problems before they happen.
+Teller reviews financial actions before they're carried out. It combines AI-based risk analysis with a rules engine to catch suspicious activity, flag missing information, and decide when a person needs to step in.
 
-Originally built at LA Hacks 2026 for the Intuit QuickBooks challenge. Now independently maintained and developed by [Mira Bhakta](https://github.com/mirabhakta).
+Originally built at LA Hacks 2026 for the Intuit QuickBooks challenge, Teller is now independently maintained by [Mira Bhakta](https://github.com/mirabhakta).
 
-## Why LedgerGuard?
+## The Idea
 
-As AI agents become more involved in accounting and financial workflows, they need safeguards beyond simply generating a response.
+AI agents are starting to handle more financial tasks, from processing invoices to managing payments. But even when an action looks reasonable, something might be wrong.
 
-An agent might attempt to pay an invoice twice, send money to an unfamiliar account, or act without enough information.
+An invoice could already be paid. A vendor's payment details might have changed. An agent might be acting without enough context.
 
-LedgerGuard sits between an agent's proposed action and its execution, evaluating whether that action should proceed, require approval, or be blocked.
+Teller checks these actions before they go through, rather than trying to catch mistakes afterward.
 
 ## How It Works
 
-1. **An agent proposes an action.** A payment, vendor update, or other financial operation enters the evaluation pipeline.
-2. **AI evaluates the risk.** Models examine the action and its context for duplicates, anomalies, and other warning signs.
-3. **Rules make the decision.** A separate policy engine determines whether the action is allowed, blocked, or needs additional review.
-4. **Humans stay in control.** Actions requiring approval are routed for review, with decisions recorded for auditing.
+Every proposed action goes through a series of checks:
 
-AI models provide risk assessments, but never directly authorize financial actions.
+1. **Evaluate** — Check the action against existing records and financial rules.
+2. **Analyze** — Use AI to identify potential duplicates, unusual activity, or missing context.
+3. **Decide** — Apply deterministic policies to determine what happens next.
+4. **Review** — Send flagged actions to a human when approval or more information is needed.
+
+The system produces four possible decisions:
+
+| Decision | What happens |
+|---|---|
+| `ALLOW` | The action passes the checks. |
+| `REQUIRE_APPROVAL` | A person must review the action. |
+| `REQUEST_CONTEXT` | More information is needed. |
+| `BLOCK` | The action is stopped. |
+
+AI evaluates the risks, but the policy engine makes the final decision.
 
 ## Features
 
-- **Risk detection** — Identify duplicate payments, unusual transactions, and suspicious changes.
-- **Policy engine** — Enforce deterministic financial rules independently of model predictions.
-- **Human review** — Approve, reject, or request additional context for flagged actions.
-- **Decision history** — Track actions, explanations, and outcomes through an audit trail.
-- **Provider benchmarks** — Compare Gemini, System One, OpenJev, and rules-based evaluation.
-- **Interactive dashboard** — Explore simulated transactions, risk assessments, and system activity.
+- **Transaction analysis** — Detect duplicate payments, unusual amounts, and suspicious changes.
+- **Human review** — Review flagged actions before allowing them to proceed.
+- **Decision history** — Keep a record of evaluations, approvals, and outcomes.
+- **Provider comparisons** — Benchmark different models and rules-based approaches.
+- **Interactive dashboard** — Explore financial scenarios, decisions, and activity.
+- **Real-time updates** — Follow evaluations as they happen through Server-Sent Events.
 
-## Tech Stack
+## Built With
 
-| Area | Technologies |
+| | Technologies |
 |---|---|
 | Frontend | React, TypeScript, Vite |
 | Backend | Python, FastAPI |
 | AI | Gemini, System One (Jev), OpenJev |
-| Orchestration | LangGraph |
+| Workflows | LangGraph |
 | Database | SQLite |
-| Evaluation | Python, custom benchmark framework |
+| Evaluation | Python, custom benchmarking tools |
 
 ## Getting Started
 
-### Requirements
+**Requirements:** Python 3.12, Node.js, and npm.
 
-- Python 3.12
-- Node.js and npm
-- API keys for optional external AI providers
-
-### Backend
+### 1. Clone the repository
 
 ```bash
-git clone https://github.com/mirabhakta/LedgerGuard.git
-cd LedgerGuard
+git clone https://github.com/mirabhakta/Teller.git
+cd Teller
+```
 
+### 2. Set up the backend
+
+```bash
 python3.12 -m venv .venv
 source .venv/bin/activate
 pip install -e '.[dev]'
 ```
 
-Copy `.env.example` to `.env` and configure the providers you want to use.
+On Windows, use `.venv\Scripts\Activate.ps1` to activate the environment.
+
+Copy `.env.example` to `.env` and configure any optional API credentials.
 
 ```bash
-PYTHONPATH=. pytest -q
 PYTHONPATH=. uvicorn backend.app.main:app --reload
 ```
 
-The API runs at `http://localhost:8000`.
-
-On Windows, activate the virtual environment using `.venv\Scripts\Activate.ps1`.
-
-### Frontend
+### 3. Start the frontend
 
 ```bash
 cd frontend
@@ -83,25 +91,35 @@ npm run dev
 
 Open `http://localhost:5173`.
 
-Some scenarios require the original hackathon dataset. See the documentation for configuration details.
+### 4. Run tests
+
+From the repository root:
+
+```bash
+PYTHONPATH=. pytest -q
+```
+
+The original hackathon dataset is required for some scenarios. Rules-based evaluation and offline tests can run without external AI credentials.
 
 ## Development
 
-LedgerGuard is an ongoing project. Current areas of development include improving risk evaluation, expanding financial scenarios, and making the review and decision workflows more useful beyond the original hackathon demo.
+Teller is still a work in progress.
+
+I'm continuing to develop it beyond the original hackathon prototype, with a focus on improving risk evaluation, expanding supported financial workflows, and making the review experience more practical.
 
 ## Documentation
 
 - [Architecture](docs/architecture.md)
 - [API Reference](docs/API_HANDOFF.md)
-- [Testing Guide](docs/FASTAPI_TESTING.md)
-- [Evaluation Plan](docs/EVAL_PLAN.md)
+- [Testing](docs/FASTAPI_TESTING.md)
+- [Evaluation](docs/EVAL_PLAN.md)
 
-## Project History
+## Origins
 
-LedgerGuard started as a collaborative project at LA Hacks 2026. The original hackathon contributions remain credited through the repository's Git history.
+Teller began as LedgerGuard, a collaborative submission to the Intuit QuickBooks challenge at LA Hacks 2026.
 
-Ongoing development and maintenance are led independently by Mira Bhakta.
+The original contributors remain credited in the project's Git history. Ongoing development is independently maintained by Mira Bhakta.
 
 ---
 
-**Note:** LedgerGuard is an experimental prototype. Financial actions are simulated, and the project is not intended for production payment processing.
+*Currently a prototype using simulated financial actions. Teller does not execute real payments or connect to live financial accounts.*
